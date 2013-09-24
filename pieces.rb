@@ -17,7 +17,7 @@ class Piece
   end
 
   #moves the piece
-  def make_piece new_position
+  def move_piece new_position
     @position = new_position
   end
 

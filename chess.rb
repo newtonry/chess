@@ -1,10 +1,33 @@
 require "./pieces.rb"
 
-class ChessGame
+class Chess
   def initialize
+    @board = Board.new
   end
 
   def play
+    @board.setup_pieces
+
+    loop do
+      @board.print_board
+      puts
+
+      move = prompt_user_for_move
+      @board.make_move(move[0], move[1])
+    end
+
+
+  end
+
+  def prompt_user_for_move
+    puts "Please enter the next move (e.g. 0,1 2,0)"
+    sanitize_input(gets.chomp)
+  end
+
+  def sanitize_input input
+    start_pos = input.split(" ")[0].split(',').map {|num| num.to_i}
+    end_pos = input.split(" ")[1].split(',').map {|num| num.to_i}
+    [start_pos, end_pos]
   end
 
 end
@@ -39,6 +62,13 @@ class Board
     end
   end
 
+  def make_move start_pos, end_pos
+    #have to validate the moves
+    @board[end_pos[0]][end_pos[1]] = @board[start_pos[0]][start_pos[1]]
+    @board[start_pos[0]][start_pos[1]].move_piece(end_pos)
+    @board[start_pos[0]][start_pos[1]] = nil
+  end
+
   #sees if the given color's king is in check
   def check? color
   end
@@ -54,7 +84,9 @@ class Board
   def print_board
     piece_set = get_visual_pieces
     #NOTICE THAT THE BOARD IS REVERSED HERE, LOOKING FROM WHITE'S POV
-    @board.reverse.each do |row|
+    counter = 7 #get rid of this later, use a diff method. purpose is to list rows
+
+    @board.reverse.each_with_index do |row, ind|
       row_output = ''
       row.each do |piece|
         row_output << '|'
@@ -64,8 +96,11 @@ class Board
           row_output << piece_set[piece.class.to_s.downcase.to_sym]
         end
       end
-      p row_output << "|"
+      p "#{counter} " << row_output << "|"
+      counter -= 1
     end
+
+    p "   " << (0..7).to_a.join(" ")
   end
 
   def get_visual_pieces
@@ -93,7 +128,7 @@ end
 
 
 
-b = Board.new()
+# b = Board.new()
 # k = King.new
 # kn = Knight.new
 # r = Rook.new
@@ -117,6 +152,13 @@ b = Board.new()
 #   b.board[move[0]][move[1]] = Pawn.new
 # end
 
-b.setup_pieces
-b.print_board
+# b.setup_pieces
+# b.print_board
+#
+# b.make_move([0,1],[2,0])
+# puts
+# puts
+# b.print_board
 
+game = Chess.new
+game.play
