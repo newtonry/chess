@@ -16,6 +16,16 @@ class Board
 
   #sets up pieces in new starting position
   def setup_pieces
+    pieces = []
+
+    pieces << Rook.new << Knight.new << Bishop.new << Queen.new
+    pieces King.new << Bishop.new << Knight.new << Rook.new
+
+    @board.with_index do |row, row_ind|
+      row.each_with_index do |column, col_ind|
+        @board[row_ind][col_ind] = pieces[col_ind]
+      end
+    end
   end
 
   #sees if the given color's king is in check
@@ -46,4 +56,5 @@ end
 
 
 b = Board.new()
+b.setup_pieces
 b.print_board
