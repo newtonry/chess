@@ -90,34 +90,28 @@ end
 
 
 b = Board.new()
-k = King.new
-kn = Knight.new
-r = Rook.new
-bish = Bishop.new
-q = Queen.new
-pawn = Pawn.new
+# k = King.new
+# kn = Knight.new
+# r = Rook.new
+# bish = Bishop.new
+# q = Queen.new
+# pawn = Pawn.new
 
-b.board[3][3] = pawn
+#b.board[3][3] = pawn
 
 
-pawn.position = [3,3]
+#pawn.position = [3,3]
 
 #p p.move_dirs
-
-
 # p bish.possible_moves
-
-
 #p k.possible_moves
-
-
 #b.setup_pieces
 #b.print_board
-b.print_board
+#b.print_board
 
-pawn.possible_moves.each do |move|
-  b.board[move[0]][move[1]] = Pawn.new
-end
+# pawn.possible_moves.each do |move|
+#   b.board[move[0]][move[1]] = Pawn.new
+# end
 
-
+b.setup_board
 b.print_board
