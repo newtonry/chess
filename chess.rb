@@ -1,0 +1,49 @@
+require "./pieces.rb"
+
+class ChessGame
+  def initialize
+  end
+
+  def play
+  end
+
+end
+
+class Board
+  def initialize
+    @board = Array.new(8) {[nil] * 8}
+  end
+
+  #sets up pieces in new starting position
+  def setup_pieces
+  end
+
+  #sees if the given color's king is in check
+  def check? color
+  end
+
+  #sees if game is over
+  def checkmate?
+  end
+
+  #duplicates board so that we can test moves
+  def dup
+  end
+
+  def print_board
+    #NOTICE THAT THE BOARD IS REVERSED HERE, LOOKING FROM WHITE'S POV
+    @board.reverse.each do |row|
+      row_output = ''
+      row.each do |piece|
+        row_output << '|'
+        row_output << ' ' if piece.nil?
+      end
+      p row_output << "|"
+    end
+  end
+end
+
+
+
+b = Board.new()
+b.print_board
