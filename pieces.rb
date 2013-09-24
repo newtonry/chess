@@ -133,6 +133,21 @@ end
 
 
 class Pawn < Piece
+  def initialize
+  end
+
+  def possible_moves
+
+    #still lacking possible diagonal moves
+
+    move = [@position[0] + 1, @position[1]]
+
+    puts move
+
+    return [] if !move_on_board?(move)
+
+    [move]
+  end
 end
 
 

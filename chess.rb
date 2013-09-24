@@ -95,13 +95,14 @@ kn = Knight.new
 r = Rook.new
 bish = Bishop.new
 q = Queen.new
+pawn = Pawn.new
 
-b.board[3][3] = q
+b.board[3][3] = pawn
 
 
-q.position = [3,3]
+pawn.position = [3,3]
 
-p q.move_dirs
+#p p.move_dirs
 
 
 # p bish.possible_moves
@@ -112,10 +113,10 @@ p q.move_dirs
 
 #b.setup_pieces
 #b.print_board
+b.print_board
 
-
-q.possible_moves.each do |move|
-  b.board[move[0]][move[1]] = Queen.new
+pawn.possible_moves.each do |move|
+  b.board[move[0]][move[1]] = Pawn.new
 end
 
 
