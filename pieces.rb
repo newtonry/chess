@@ -60,8 +60,6 @@ class SlidingPiece < Piece
   end
 end
 
-
-
 class Rook < SlidingPiece
   def initialize
     #find a way to get rid of this
@@ -95,6 +93,10 @@ class Queen < SlidingPiece
   def move_dirs
     @diagonal_dirs + @straight_dirs
   end
+
+
+
+
 end
 
 
