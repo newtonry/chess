@@ -17,7 +17,8 @@ class Piece
   end
 
   #moves the piece
-  def move
+  def make_piece new_position
+    @position = new_position
   end
 
   #list of valid moves

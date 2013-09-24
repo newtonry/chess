@@ -22,16 +22,20 @@ class Board
 
     pieces << Rook.new << Knight.new << Bishop.new << Queen.new
     pieces << King.new << Bishop.new << Knight.new << Rook.new
+    pawns = []
 
-    @board.each_with_index do |row, row_ind|
-      row.each_with_index do |column, col_ind|
+    8.times do |x|
+      pawns << Pawn.new
+    end
 
+    fill_row(0, pieces)
+    fill_row(1, pawns)
+  end
 
-
-        @board[row_ind][col_ind] = pieces.shift
-
-#        @board[row_ind][col_ind].set_position([row_ind][col_ind])
-      end
+  def fill_row row_ind, pieces
+    @board[row_ind].each_with_index do |square, ind|
+      @board[row_ind][ind] = pieces.shift
+      @board[row_ind][ind].set_position([row_ind, ind])
     end
   end
 
@@ -113,5 +117,6 @@ b = Board.new()
 #   b.board[move[0]][move[1]] = Pawn.new
 # end
 
-b.setup_board
+b.setup_pieces
 b.print_board
+
