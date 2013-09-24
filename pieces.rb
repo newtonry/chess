@@ -24,38 +24,75 @@ class Piece
   def valid_moves
   end
 
-  def valid_move? move
-    #if out of bounds
+  def move_on_board? move
     return false if (!(0..7).include?(move[0]) or !(0..7).include?(move[1]))
     true
-
-    #write functionality for check
-
-
-
   end
 end
 
 
 #can move until the end of the board in move_dirs
 class SlidingPiece < Piece
-end
-
-class Queen < SlidingPiece
   def initialize
-    @unicode = "\u2655" # will have to switch based on color
+    @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
+    @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
+  end
+
+  def possible_moves
+    poss_moves = []
+    #needs to take move_dirs and vectorize the dirs
+    move_dirs.each do |dir|
+      multiplier = 1
+      loop do
+        move_vec = dir.map { |el| el * multiplier}
+        move = [@position[0] + move_vec[0], @position[1] + move_vec[1]]
+
+        if move_on_board?(move) == false
+          break
+        end
+
+        poss_moves << move
+        multiplier += 1
+      end
+    end
+    poss_moves
   end
 end
 
+
+
 class Rook < SlidingPiece
   def initialize
-    @unicode = "\u2656"
+    #find a way to get rid of this
+    @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
+  end
+
+  def move_dirs
+    @straight_dirs
   end
 end
 
 class Bishop < SlidingPiece
   def initialize
-    @unicode = "\u2657"
+    #find a way to get rid of this
+    @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
+  end
+
+  def move_dirs
+    @diagonal_dirs
+  end
+
+end
+
+class Queen < SlidingPiece
+  def initialize
+    #find a way to get rid of this
+    @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
+    @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
+  end
+
+  def move_dirs
+    @diagonal_dirs + @straight_dirs
   end
 end
 
@@ -68,18 +105,13 @@ class SteppingPiece < Piece
 #      p [position[0] + dir[0], position[1] + dir[1]]
 
       [position[0] + dir[0], position[1] + dir[1]]
-    end.select {|move| valid_move?(move) and move != @position}
-
-
+    end.select {|move| move_on_board?(move) and move != @position}
   end
-
-
 end
 
 
 class King < SteppingPiece
   def initialize
-    @unicode = "\u2654"
   end
 
   def move_dirs
@@ -88,16 +120,19 @@ class King < SteppingPiece
 
 end
 
-class Knight < Piece
+class Knight < SteppingPiece
   def initialize
-    @unicode = "\u2658"
+  end
+
+  def move_dirs
+    steps = [1,2,-1,-2].permutation(2).to_a.reject do |combo|
+      combo[0] + combo[1] == 0
+    end
   end
 end
 
 
 class Pawn < Piece
-  "\u2659"
-
 end
 
 

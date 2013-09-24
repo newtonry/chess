@@ -85,21 +85,38 @@ class Board
 
     white_unicode
   end
-
 end
 
 
 
 b = Board.new()
 k = King.new
+kn = Knight.new
+r = Rook.new
+bish = Bishop.new
+q = Queen.new
 
-b.board[0][0] = k
+b.board[3][3] = q
 
 
-k.position = [3,3]
+q.position = [3,3]
 
-p k.possible_moves
+p q.move_dirs
+
+
+# p bish.possible_moves
+
+
+#p k.possible_moves
 
 
 #b.setup_pieces
+#b.print_board
+
+
+q.possible_moves.each do |move|
+  b.board[move[0]][move[1]] = Queen.new
+end
+
+
 b.print_board
