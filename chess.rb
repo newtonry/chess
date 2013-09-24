@@ -13,7 +13,10 @@ class Chess
       puts
 
       move = prompt_user_for_move
-      @board.make_move(move[0], move[1])
+
+      if is_valid_move?(move)
+        @board.make_move(move[0], move[1])
+      end
     end
 
 
@@ -67,6 +70,15 @@ class Board
     @board[end_pos[0]][end_pos[1]] = @board[start_pos[0]][start_pos[1]]
     @board[start_pos[0]][start_pos[1]].move_piece(end_pos)
     @board[start_pos[0]][start_pos[1]] = nil
+  end
+
+  def is_valid_move? start_pos, end_pos
+    if !@board[start_pos[0]][start_pos[1]].possible_moves.include?(end_pos)
+      puts "Piece can't move there!!!!!"
+      return false
+    end
+    true
+
   end
 
   #sees if the given color's king is in check
