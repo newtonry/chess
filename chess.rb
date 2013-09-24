@@ -38,7 +38,7 @@ end
 
 
 # b = Board.new()
-k = King.new
+#k = King.new
 # kn = Knight.new
 # r = Rook.new
 # bish = Bishop.new
@@ -69,14 +69,18 @@ k = King.new
 # puts
 # b.print_board
 
+# b = Board.new
+# b.print_board
+#
+# c = b.deep_dup
+# c.board[3][3] = k
+#
+b.print_board
+c.setup_pieces
+c.print_board
+
+
+#
 # game = Chess.new
 # game.play
 
-b = Board.new
-b.print_board
-
-c = b.deep_dup
-c.board[3][3] = k
-
-b.print_board
-c.print_board
