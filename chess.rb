@@ -40,7 +40,8 @@ end
  # b = Board.new()
 #k = King.new
 # kn = Knight.new
-# r = Rook.new
+ # r = Rook.new(:white)
+ # p r.color
 # bish = Bishop.new
 # q = Queen.new
 # pawn = Pawn.new

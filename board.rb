@@ -11,19 +11,32 @@ class Board
 
   #sets up pieces in new starting position
   def setup_pieces
+    setup_color(:white)
+    setup_color(:black)
+
+  end
+
+  def setup_color color
     pieces = []
 
-    pieces << Rook.new << Knight.new << Bishop.new << Queen.new
-    pieces << King.new << Bishop.new << Knight.new << Rook.new
+    pieces << Rook.new(color) << Knight.new(color) << Bishop.new(color)
+    pieces << Queen.new(color) << King.new(color) << Bishop.new(color)
+    pieces << Knight.new(color) << Rook.new(color)
     pawns = []
 
     8.times do |x|
-      pawns << Pawn.new
+      pawns << Pawn.new(color)
     end
 
-    fill_row(0, pieces)
-    fill_row(1, pawns)
+    if color == :white
+      fill_row(0, pieces)
+      fill_row(1, pawns)
+    elsif color == :black
+      fill_row(7, pieces)
+      fill_row(6, pawns)
+    end
   end
+
 
   def fill_row row_ind, pieces
     @board[row_ind].each_with_index do |square, ind|
@@ -119,7 +132,8 @@ class Board
         if piece.nil?
           row_output << ' '
         else
-          row_output << piece_set[piece.class.to_s.downcase.to_sym]
+          color_set = piece_set[piece.color]
+          row_output << color_set[piece.class.to_s.downcase.to_sym]
         end
       end
       p "#{counter} " << row_output << "|"
@@ -148,6 +162,6 @@ class Board
       :pawn => "\u265F"
     }
 
-    white_unicode
+    { :white => white_unicode, :black => black_unicode }
   end
 end

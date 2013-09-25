@@ -1,13 +1,14 @@
 class Piece
-  attr_accessor :position#, :color
+  attr_accessor :position, :color
 
   #creates the piece in a given position
-  def initialize #color
+  def initialize color
     @position = position
+    @color = color
   end
 
   def set_position position
-    #in [row, column] formate
+    #in [row, column] format
     @position = position
   end
 
@@ -29,9 +30,10 @@ end
 
 #can move until the end of the board in move_dirs
 class SlidingPiece < Piece
-  def initialize
+  def initialize color
     @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
     @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
+    super(color)
   end
 
   def possible_moves
@@ -56,7 +58,8 @@ class SlidingPiece < Piece
 end
 
 class Rook < SlidingPiece
-  def initialize
+  def initialize color
+    super(color)
     #find a way to get rid of this
     @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
   end
@@ -67,7 +70,9 @@ class Rook < SlidingPiece
 end
 
 class Bishop < SlidingPiece
-  def initialize
+  def initialize color
+    super(color)
+
     #find a way to get rid of this
     @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
   end
@@ -79,7 +84,8 @@ class Bishop < SlidingPiece
 end
 
 class Queen < SlidingPiece
-  def initialize
+  def initialize color
+    super(color)
     #find a way to get rid of this
     @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
     @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
@@ -88,12 +94,14 @@ class Queen < SlidingPiece
   def move_dirs
     @diagonal_dirs + @straight_dirs
   end
-
 end
 
 
 #stepping pieces can move 1
 class SteppingPiece < Piece
+  def initialize color
+    super(color)
+  end
 
   def possible_moves
     move_dirs.map do |dir|
@@ -103,7 +111,8 @@ class SteppingPiece < Piece
 end
 
 class King < SteppingPiece
-  def initialize
+  def initialize color
+    super(color)
   end
 
   def move_dirs
@@ -112,7 +121,8 @@ class King < SteppingPiece
 end
 
 class Knight < SteppingPiece
-  def initialize
+  def initialize color
+    super(color)
   end
 
   def move_dirs
@@ -124,7 +134,8 @@ end
 
 
 class Pawn < Piece
-  def initialize
+  def initialize color
+    super(color)
   end
 
   def possible_moves
