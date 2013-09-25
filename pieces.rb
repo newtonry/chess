@@ -17,10 +17,6 @@ class Piece
     @position = new_position
   end
 
-  #list of valid moves
-  def valid_moves
-  end
-
   def move_on_board? move
     return false if (!(0..7).include?(move[0]) or !(0..7).include?(move[1]))
     true

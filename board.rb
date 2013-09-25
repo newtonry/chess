@@ -61,11 +61,17 @@ class Board
       return false
     end
 
-
+    if same_color_collision?(start_pos, end_pos)
+      puts "You can't take your own piece!!!"
+      return false
+    end
 
     if piece.is_a?(SlidingPiece)
       return false if sliding_piece_collision?(start_pos, end_pos)
     end
+
+    #still have to run the is king in check
+
 
     true
   end
@@ -80,6 +86,8 @@ class Board
       pos[0] += direction[0]
       pos[1] += direction[1]
 
+      return false if pos == end_pos #need to code this better
+
       if !@board[pos[0]][pos[1]].nil? #a piece is in the way!
         puts "Piece can't move there!!!!!"
         return true
@@ -88,9 +96,45 @@ class Board
     false
   end
 
-  def same_color_collision start_pos, end_pos
-    if get_board_piece[start_pos].is_a?(Piece) and get_board_piece[start_pos].is_a?(Piece)
+  #sees if the given color's king is in check
+  def check? color
+    
+    
+    
+  end
 
+  def select_all_pieces_of color
+    pieces = []
+    @board.each do |row|
+      row.each do |piece|
+        pieces << piece if !piece.nil? and piece.color == color
+      end
+    end
+    pieces
+  end
+
+
+  #returns the position of the selected king
+  def find_king_position color
+    @board.each_with_index do |row, row_ind|
+      row.each_with_index do |piece, column_ind|
+        return [row_ind, column_ind]  if piece.is_a?(King) and piece.color == color
+      end
+    end
+    raise "Never found King, something's wrong"
+  end
+
+  #sees if game is over
+  def checkmate?
+  end
+
+
+  def same_color_collision? (start_pos, end_pos)
+    if get_board_piece(start_pos).is_a?(Piece) and get_board_piece(end_pos).is_a?(Piece)
+      return true if get_board_piece(start_pos).color == get_board_piece(end_pos).color
+    end
+    false
+    
   end
 
   def get_board_piece pos
@@ -130,13 +174,6 @@ class Board
     end
   end
 
-  #sees if the given color's king is in check
-  def check? color
-  end
-
-  #sees if game is over
-  def checkmate?
-  end
 
   def print_board
     piece_set = get_visual_pieces
