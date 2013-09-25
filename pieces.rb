@@ -1,19 +1,14 @@
 class Piece
-  attr_accessor :position
+  attr_accessor :position#, :color
 
   #creates the piece in a given position
-  def initialize
-    @unicode = ''
+  def initialize #color
     @position = position
   end
 
   def set_position position
     #in [row, column] formate
     @position = position
-  end
-
-  def unicode
-    @unicode
   end
 
   #moves the piece
@@ -94,9 +89,6 @@ class Queen < SlidingPiece
     @diagonal_dirs + @straight_dirs
   end
 
-
-
-
 end
 
 
@@ -105,13 +97,10 @@ class SteppingPiece < Piece
 
   def possible_moves
     move_dirs.map do |dir|
-#      p [position[0] + dir[0], position[1] + dir[1]]
-
       [position[0] + dir[0], position[1] + dir[1]]
-    end.select {|move| move_on_board?(move) and move != @position}
+    end.select { |move| move_on_board?(move) and move != @position }
   end
 end
-
 
 class King < SteppingPiece
   def initialize
@@ -120,7 +109,6 @@ class King < SteppingPiece
   def move_dirs
     [1,0,0,-1,1,-1].combination(2).to_a.uniq
   end
-
 end
 
 class Knight < SteppingPiece
@@ -144,9 +132,6 @@ class Pawn < Piece
     #still lacking possible diagonal moves
 
     move = [@position[0] + 1, @position[1]]
-
-    puts move
-
     return [] if !move_on_board?(move)
 
     [move]

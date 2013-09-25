@@ -16,6 +16,7 @@ class Chess
       move = prompt_user_for_move
 
       if @board.is_valid_move?(move[0], move[1])
+
         @board.make_move(move[0], move[1])
       end
     end
@@ -31,13 +32,12 @@ class Chess
     end_pos = input.split(" ")[1].split(',').map {|num| num.to_i}
     [start_pos, end_pos]
   end
-
 end
 
 
 
 
-# b = Board.new()
+ # b = Board.new()
 #k = King.new
 # kn = Knight.new
 # r = Rook.new
@@ -69,18 +69,22 @@ end
 # puts
 # b.print_board
 
-# b = Board.new
+ # b = Board.new
 # b.print_board
 #
-# c = b.deep_dup
+ # c = b.deep_dup
 # c.board[3][3] = k
 #
-b.print_board
-c.setup_pieces
-c.print_board
+# b.print_board
+# c.setup_pieces
+# c.print_board
 
 
 #
-# game = Chess.new
-# game.play
+ game = Chess.new
+ game.play
+
+
+
+#p get_direction([0,0], [0,5])
 
