@@ -141,8 +141,9 @@ class Pawn < Piece
   def possible_moves
 
     #still lacking possible diagonal moves
+    direction = @color == :white ? 1 : -1
 
-    move = [@position[0] + 1, @position[1]]
+    move = [@position[0] + direction, @position[1]]
     return [] if !move_on_board?(move)
 
     [move]

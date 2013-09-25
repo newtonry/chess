@@ -62,7 +62,7 @@ class Board
     end
 
     if piece.is_a?(SlidingPiece)
-      return false if sliding_piece_collision(start_pos, end_pos)
+      return false if sliding_piece_collision?(start_pos, end_pos)
     end
 
     true

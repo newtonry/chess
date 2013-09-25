@@ -14,6 +14,9 @@ class Chess
       @board.print_board
       puts
 
+      puts "#{turn.first.to_s.capitalize}'s turn!"
+
+
       move = prompt_user_for_move
 
       if @board.is_valid_move?(move[0], move[1], turn.first)
