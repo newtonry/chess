@@ -1,6 +1,15 @@
 require "colorize"
 
 class Board
+  VISUAL_PIECE_SET = {
+    :king => "\u265A",
+    :queen => "\u265B",
+    :rook => "\u265C",
+    :bishop => "\u265D",
+    :knight => "\u265E",
+    :pawn => "\u265F"
+  }
+
   attr_accessor :board
 
   def initialize board_status = nil
@@ -18,21 +27,24 @@ class Board
   end
 
   def setup_color color
-    pieces = []
+    pieces = [
+      Rook.new(color),
+      Knight.new(color),
+      Bishop.new(color),
+      Queen.new(color),
+      King.new(color),
+      Bishop.new(color),
+      Knight.new(color),
+      Rook.new(color)
+    ]
 
-    pieces << Rook.new(color) << Knight.new(color) << Bishop.new(color)
-    pieces << Queen.new(color) << King.new(color) << Bishop.new(color)
-    pieces << Knight.new(color) << Rook.new(color)
     pawns = []
-
-    8.times do |x|
-      pawns << Pawn.new(color, self)
-    end
+    8.times { pawns << Pawn.new(color, self) }
 
     if color == :white
       fill_row(0, pieces)
       fill_row(1, pawns)
-    elsif color == :black
+    else
       fill_row(7, pieces)
       fill_row(6, pawns)
     end
@@ -47,7 +59,7 @@ class Board
   end
 
   def make_move start_pos, end_pos
-    piece = @board[start_pos[0]][start_pos[1]]
+    piece = get_board_piece(start_pos)
     @board[end_pos[0]][end_pos[1]] = piece
     piece.position = end_pos
     @board[start_pos[0]][start_pos[1]] = nil
@@ -55,7 +67,6 @@ class Board
 
   def is_valid_move? start_pos, end_pos, color
     return false unless movement_helper?(start_pos, end_pos, color)
-
     return false if puts_self_in_check?(start_pos, end_pos, color)
 
     true
@@ -66,19 +77,9 @@ class Board
 
     return false if piece.nil?
     return false if piece.color != color
-
-    if !piece.possible_moves.include?(end_pos)
-      return false
-    end
-
-    if same_color_collision?(start_pos, end_pos)
-      return false
-    end
-
-    if piece.is_a?(SlidingPiece)
-      return false if sliding_piece_collision?(start_pos, end_pos)
-    end
-
+    return false if !piece.possible_moves.include?(end_pos)
+    return false if same_color_collision?(start_pos, end_pos)
+    return false if piece.is_a?(SlidingPiece) && sliding_piece_collision?(start_pos, end_pos)
     true
   end
 
@@ -88,15 +89,11 @@ class Board
     pos = start_pos.dup
 
     #incrementally moves pos towards the end_pos
-    until pos == end_pos
+    until pos == [end_pos[0] - direction[0], end_pos[1] - direction[1]]
       pos[0] += direction[0]
       pos[1] += direction[1]
 
-      return false if pos == end_pos #need to code this better
-
-      if !@board[pos[0]][pos[1]].nil? #a piece is in the way!
-        return true
-      end
+      return true if get_board_piece(pos) #a piece is in the way!
     end
     false
   end
@@ -120,11 +117,10 @@ class Board
 
     pieces.each do |piece|
       piece.possible_moves.each do |move|
-        if movement_helper?(piece.position, move, piece.color) and move == king_position
-          return true
-        end
+        return true if movement_helper?(piece.position, move, piece.color) && move == king_position
       end
     end
+
     false
   end
 
@@ -145,32 +141,29 @@ class Board
   end
 
   def select_all_pieces_of color
-    pieces = []
-    @board.each do |row|
-      row.each do |piece|
-        pieces << piece if !piece.nil? and piece.color == color
+    [].tap do |pieces|
+      @board.each do |row|
+        row.each do |piece|
+          pieces << piece if piece && piece.color == color
+        end
       end
     end
-    pieces
   end
-
 
   #returns the position of the selected king
   def find_king_position color
     @board.each_with_index do |row, row_ind|
       row.each_with_index do |piece, column_ind|
-        return [row_ind, column_ind]  if piece.is_a?(King) and piece.color == color
+        return [row_ind, column_ind] if piece.is_a?(King) && piece.color == color
       end
     end
     raise "Never found King, something's wrong"
   end
 
   def same_color_collision? (start_pos, end_pos)
-    if get_board_piece(start_pos).is_a?(Piece) and get_board_piece(end_pos).is_a?(Piece)
-      return true if get_board_piece(start_pos).color == get_board_piece(end_pos).color
-    end
-    false
-
+    start_piece = get_board_piece(start_pos)
+    end_piece = get_board_piece(end_pos)
+    return start_piece && end_piece && start_piece.color == end_piece.color
   end
 
   def get_board_piece pos
@@ -199,72 +192,39 @@ class Board
 
   #gets the direction a move is going, in the smallest possible step
   def get_direction start_pos, end_pos
-    difference = [end_pos[0] - start_pos[0] , end_pos[1] - start_pos[1]]
-    difference.map do |value|
-      if value == 0
-        value
-      else
-        value/(value.abs)
-      end
-    end
+    difference = [end_pos[0] - start_pos[0], end_pos[1] - start_pos[1]]
+    difference.map { |value| value <=> 0 }
   end
 
   def get_pawn_in_back_row
     (@board[7] + @board[0]).each do |piece|
-      if piece.is_a?(Pawn)
-        return piece
-      end
+      return piece if piece.is_a?(Pawn)
     end
     nil
   end
 
-
   def print_board
-    piece_set = get_visual_pieces
     #NOTICE THAT THE BOARD IS REVERSED HERE, LOOKING FROM WHITE'S POV
     board_output = ""
-
     backgrounds = [:cyan, :light_blue]
+
     @board.reverse.each_with_index do |row, ind|
-      row_output = ''
+      row_output = ""
       row.each do |piece|
-        #row_output << ' '.colorize(:background => backgrounds[0])
         if piece.nil?
-          row_output << '  '.colorize(:background => backgrounds[0])
-          backgrounds.reverse!
+          row_output << "  ".colorize(:background => backgrounds[0])
         else
-          color_set = piece_set[piece.color]
-          row_output << (color_set[piece.class.to_s.downcase.to_sym] + " ").colorize(:color => piece.color, :background => backgrounds[0])
-          backgrounds.reverse!
+          piece_output = VISUAL_PIECE_SET[piece.class.to_s.downcase.to_sym] + " "
+          piece_output = piece_output.colorize(:color => piece.color, :background => backgrounds[0])
+          row_output << piece_output
         end
+        backgrounds.reverse!
       end
-      board_output << "#{8 - ind} " << row_output << " \n"
+      board_output << "#{8 - ind} " + row_output + " \n"
       backgrounds.reverse!
     end
 
-    board_output << "  " << ("A".."H").to_a.join(" ")
+    board_output << "  " + ("A".."H").to_a.join(" ")
     puts board_output
-  end
-
-  def get_visual_pieces
-    white_unicode = {
-      :king => "\u265A",
-      :queen => "\u265B",
-      :rook => "\u265C",
-      :bishop => "\u265D",
-      :knight => "\u265E",
-      :pawn => "\u265F"
-    }
-
-    black_unicode = {
-      :king => "\u265A",
-      :queen => "\u265B",
-      :rook => "\u265C",
-      :bishop => "\u265D",
-      :knight => "\u265E",
-      :pawn => "\u265F"
-    }
-
-    { :white => white_unicode, :black => black_unicode }
   end
 end

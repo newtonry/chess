@@ -10,13 +10,17 @@ class Chess
     @board.setup_pieces
     turn = [:white, :black]
 
+    erred = false
     loop do
+      system('clear')
+      puts
       @board.print_board
       puts
-
+      if erred
+        puts "Invalid move!"
+        erred = false
+      end
       puts "#{turn.first.to_s.capitalize}'s turn!"
-
-
 
       move = prompt_user_for_move
       next if move == nil
@@ -30,16 +34,13 @@ class Chess
           prompt_upgrade(upgrade_pawn)
         end
 
-
-
-
         turn.reverse!
-        if @board.checkmate?(turn[0])
+        if @board.checkmate?(turn.first)
           puts "Checkmate! #{turn.first.to_s.capitalize} loses!"
           return
         end
       else
-        puts "Not a valid move"
+        erred = true
       end
     end
   end
@@ -56,7 +57,6 @@ class Chess
     end
 
     @board.board[piece.position[0]][piece.position[1]] = new_piece
-
   end
 
   def prompt_user_for_move
