@@ -3,7 +3,7 @@ class Board
 
   def initialize board_status = nil
     if board_status.nil?
-      @board = Array.new(8) {[nil] * 8}
+      @board = Array.new(8) { [nil] * 8 }
     else
       @board = board_status
     end
@@ -61,6 +61,8 @@ class Board
       return false
     end
 
+
+
     if piece.is_a?(SlidingPiece)
       return false if sliding_piece_collision?(start_pos, end_pos)
     end
@@ -68,6 +70,7 @@ class Board
     true
   end
 
+  #looks at the path of sliding pieces for a collision
   def sliding_piece_collision? start_pos, end_pos
     direction = get_direction(start_pos, end_pos)
     pos = start_pos.dup
@@ -83,7 +86,15 @@ class Board
       end
     end
     false
+  end
 
+  def same_color_collision start_pos, end_pos
+    if get_board_piece[start_pos].is_a?(Piece) and get_board_piece[start_pos].is_a?(Piece)
+
+  end
+
+  def get_board_piece pos
+    @board[pos[0]][pos[1]]
   end
 
   #duplicates board so that we can test moves
