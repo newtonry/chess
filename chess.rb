@@ -8,6 +8,7 @@ class Chess
 
   def play
     @board.setup_pieces
+    turn = [:white, :black]
 
     loop do
       @board.print_board
@@ -15,9 +16,10 @@ class Chess
 
       move = prompt_user_for_move
 
-      if @board.is_valid_move?(move[0], move[1])
+      if @board.is_valid_move?(move[0], move[1], turn.first)
 
         @board.make_move(move[0], move[1])
+        turn.reverse!
       end
     end
   end

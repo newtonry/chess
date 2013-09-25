@@ -13,7 +13,6 @@ class Board
   def setup_pieces
     setup_color(:white)
     setup_color(:black)
-
   end
 
   def setup_color color
@@ -52,8 +51,10 @@ class Board
     @board[start_pos[0]][start_pos[1]] = nil
   end
 
-  def is_valid_move? start_pos, end_pos
+  def is_valid_move? start_pos, end_pos, color
     piece = @board[start_pos[0]][start_pos[1]]
+
+    return false if piece.color != color
 
     if !piece.possible_moves.include?(end_pos)
       puts "Piece can't move there!!!!!"
