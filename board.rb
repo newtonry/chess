@@ -209,6 +209,15 @@ class Board
     end
   end
 
+  def get_pawn_in_back_row
+    (@board[7] + @board[0]).each do |piece|
+      if piece.is_a?(Pawn)
+        return piece
+      end
+    end
+    nil
+  end
+
 
   def print_board
     piece_set = get_visual_pieces

@@ -16,11 +16,23 @@ class Chess
 
       puts "#{turn.first.to_s.capitalize}'s turn!"
 
-      move = prompt_user_for_move
 
+
+      move = prompt_user_for_move
+      next if move == nil
       if @board.is_valid_move?(move[0], move[1], turn.first)
 
         @board.make_move(move[0], move[1])
+
+        upgrade_pawn = @board.get_pawn_in_back_row
+
+        unless upgrade_pawn.nil?
+          prompt_upgrade(upgrade_pawn)
+        end
+
+
+
+
         turn.reverse!
         if @board.checkmate?(turn[0])
           puts "Checkmate! #{turn.first.to_s.capitalize} loses!"
@@ -32,6 +44,21 @@ class Chess
     end
   end
 
+  def prompt_upgrade piece
+    puts "Your pawn is upgradeable. Please enter Q, K, B, or R"
+    new_piece = gets.chomp.upcase
+
+    new_piece = case new_piece
+    when "Q" then Queen.new(piece.color, piece.position)
+    when "K" then Knight.new(piece.color, piece.position)
+    when "B" then Bishop.new(piece.color, piece.position)
+    when "R" then Rook.new(piece.color, piece.position)
+    end
+
+    @board.board[piece.position[0]][piece.position[1]] = new_piece
+
+  end
+
   def prompt_user_for_move
     print "Please enter the next move (e.g. a2 a3): "
     sanitize_input(gets)
@@ -39,6 +66,7 @@ class Chess
 
   def sanitize_input input
     input = input.strip.upcase
+    return nil if input.empty?
     start_pos, end_pos = *input.split
 
     start_pos = start_pos.each_char.to_a
@@ -50,58 +78,5 @@ class Chess
   end
 end
 
-
-
-
- # b = Board.new()
-#k = King.new
-# kn = Knight.new
- # r = Rook.new(:white)
- # p r.color
-# bish = Bishop.new
-# q = Queen.new
-# pawn = Pawn.new
-
-#b.board[3][3] = pawn
-
-
-#pawn.position = [3,3]
-
-#p p.move_dirs
-# p bish.possible_moves
-#p k.possible_moves
-#b.setup_pieces
-#b.print_board
-#b.print_board
-
-# pawn.possible_moves.each do |move|
-#   b.board[move[0]][move[1]] = Pawn.new
-# end
-
-# b.setup_pieces
-# b.print_board
-#
-# b.make_move([0,1],[2,0])
-# puts
-# puts
-# b.print_board
-
- # b = Board.new
-# b.print_board
-#
- # c = b.deep_dup
-# c.board[3][3] = k
-#
-# b.print_board
-# c.setup_pieces
-# c.print_board
-
-
-#
- game = Chess.new
- game.play
-
-
-
-#p get_direction([0,0], [0,5])
-
+game = Chess.new
+game.play

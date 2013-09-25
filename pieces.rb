@@ -2,7 +2,7 @@ class Piece
   attr_accessor :position, :color
 
   #creates the piece in a given position
-  def initialize color
+  def initialize color, position = nil
     @position = position
     @color = color
   end
@@ -16,11 +16,8 @@ end
 
 #can move until the end of the board in move_dirs
 class SlidingPiece < Piece
-  def initialize color
-    @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
-    @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
-    super(color)
-  end
+  DIAGONAL_DIRS = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
+  STRAIGHT_DIRS = [[1, 0], [0, -1], [-1, 0], [0, 1]]
 
   def possible_moves
     poss_moves = []
@@ -44,51 +41,26 @@ class SlidingPiece < Piece
 end
 
 class Rook < SlidingPiece
-  def initialize color
-    super(color)
-    #find a way to get rid of this
-    @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
-  end
-
   def move_dirs
-    @straight_dirs
+    STRAIGHT_DIRS
   end
 end
 
 class Bishop < SlidingPiece
-  def initialize color
-    super(color)
-
-    #find a way to get rid of this
-    @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
-  end
-
   def move_dirs
-    @diagonal_dirs
+    DIAGONAL_DIRS
   end
-
 end
 
 class Queen < SlidingPiece
-  def initialize color
-    super(color)
-    #find a way to get rid of this
-    @diagonal_dirs = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
-    @straight_dirs = [[1, 0], [0, -1], [-1, 0], [0, 1]]
-  end
-
   def move_dirs
-    @diagonal_dirs + @straight_dirs
+    DIAGONAL_DIRS + STRAIGHT_DIRS
   end
 end
 
 
 #stepping pieces can move 1
 class SteppingPiece < Piece
-  def initialize color
-    super(color)
-  end
-
   def possible_moves
     move_dirs.map do |dir|
       [position[0] + dir[0], position[1] + dir[1]]
@@ -97,20 +69,12 @@ class SteppingPiece < Piece
 end
 
 class King < SteppingPiece
-  def initialize color
-    super(color)
-  end
-
   def move_dirs
     [1,0,0,-1,1,-1].combination(2).to_a.uniq
   end
 end
 
 class Knight < SteppingPiece
-  def initialize color
-    super(color)
-  end
-
   def move_dirs
     steps = [1,2,-1,-2].permutation(2).to_a.reject do |combo|
       combo[0] + combo[1] == 0
@@ -131,6 +95,10 @@ class Pawn < Piece
     moves = []
     basic_move = [@position[0] + direction, @position[1]]
     moves << basic_move if move_on_board?(basic_move) and @board.get_board_piece(basic_move).nil?
+    first_move = [@position[0] + (direction * 2), @position[1]]
+    if (@color == :white && position[0] == 1) || (@color == :black && position[0] == 6)
+      moves << first_move
+    end
 
     attacks = []
     attacks << [@position[0] + direction, @position[1] + 1]
