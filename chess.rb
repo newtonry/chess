@@ -15,14 +15,17 @@ class Chess
       puts
 
       puts "#{turn.first.to_s.capitalize}'s turn!"
-      
+
       move = prompt_user_for_move
 
       if @board.is_valid_move?(move[0], move[1], turn.first)
 
-        @board.make_move(move[0], move[1])    
+        @board.make_move(move[0], move[1])
         turn.reverse!
-        @board.check?(turn[0])
+        if @board.checkmate?(turn[0])
+          puts "Checkmate! #{turn[0].to_s} loses!"
+          return
+        end
       else
         puts "Not a valid move"
       end

@@ -40,18 +40,26 @@ class Board
   def fill_row row_ind, pieces
     @board[row_ind].each_with_index do |square, ind|
       @board[row_ind][ind] = pieces.shift
-      @board[row_ind][ind].set_position([row_ind, ind])
+      @board[row_ind][ind].position = [row_ind, ind]
     end
   end
 
   def make_move start_pos, end_pos
     piece = @board[start_pos[0]][start_pos[1]]
     @board[end_pos[0]][end_pos[1]] = piece
-    piece.move_piece(end_pos)
+    piece.position = end_pos
     @board[start_pos[0]][start_pos[1]] = nil
   end
 
   def is_valid_move? start_pos, end_pos, color
+    return false unless movement_helper?(start_pos, end_pos, color)
+
+    return false if puts_self_in_check?(start_pos, end_pos, color)
+
+    true
+  end
+
+  def movement_helper?(start_pos, end_pos, color)
     piece = @board[start_pos[0]][start_pos[1]]
 
     return false if piece.color != color
@@ -68,12 +76,6 @@ class Board
       return false if sliding_piece_collision?(start_pos, end_pos)
     end
 
-    #still have to run the is king in check
-    if puts_self_in_check?(start_pos, end_pos, color)
-      "YOU PUT YOURSELF IN CHECK!"
-      return false 
-    end
-    
     true
   end
 
@@ -96,16 +98,10 @@ class Board
     false
   end
 
-  def puts_self_in_check? start_pos, end_pos, color    
+  def puts_self_in_check? start_pos, end_pos, color
     test_board = self.deep_dup
-    piece = test_board.get_board_piece(start_pos)
-    
-    p piece.class
-    
-  #  test_board[start_pos[0]][start_pos[1]] = nil
-   # test_board[end_pos[0]][end_pos[1]] = piece
-    
-    check?(color)
+    test_board.make_move(start_pos, end_pos)
+    test_board.check?(color)
   end
 
 
@@ -118,17 +114,31 @@ class Board
       pieces = select_all_pieces_of(:white)
       king_position = find_king_position(color)
     end
-    
-    
+
     pieces.each do |piece|
       piece.possible_moves.each do |move|
-        if is_valid_move?(piece.position, move, piece.color) and move == king_position
-          puts "CHHHHHHHHHHHECCCCCCCCCCCCCCCCKKKKKKKKK!KKK"
+        if movement_helper?(piece.position, move, piece.color) and move == king_position
           return true
         end
       end
     end
     false
+  end
+
+  #sees if game is over
+  def checkmate? color
+    return false unless check?(color)
+    pieces = select_all_pieces_of(color)
+    pieces.each do |piece|
+      piece.possible_moves.each do |move|
+        if movement_helper?(piece.position, move, piece.color)
+          test_board = self.deep_dup
+          test_board.make_move(piece.position, move)
+          return false unless test_board.check?(color)
+        end
+      end
+    end
+    true
   end
 
   def select_all_pieces_of color
@@ -152,17 +162,12 @@ class Board
     raise "Never found King, something's wrong"
   end
 
-  #sees if game is over
-  def checkmate?
-  end
-
-
   def same_color_collision? (start_pos, end_pos)
     if get_board_piece(start_pos).is_a?(Piece) and get_board_piece(end_pos).is_a?(Piece)
       return true if get_board_piece(start_pos).color == get_board_piece(end_pos).color
     end
     false
-    
+
   end
 
   def get_board_piece pos
@@ -196,7 +201,6 @@ class Board
       if value == 0
         value
       else
-        puts value
         value/(value.abs)
       end
     end

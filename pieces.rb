@@ -7,16 +7,6 @@ class Piece
     @color = color
   end
 
-  def set_position position
-    #in [row, column] format
-    @position = position
-  end
-
-  #moves the piece
-  def move_piece new_position
-    @position = new_position
-  end
-
   def move_on_board? move
     return false if (!(0..7).include?(move[0]) or !(0..7).include?(move[1]))
     true
