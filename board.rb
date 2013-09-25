@@ -1,3 +1,5 @@
+require "colorize"
+
 class Board
   attr_accessor :board
 
@@ -24,7 +26,7 @@ class Board
     pawns = []
 
     8.times do |x|
-      pawns << Pawn.new(color)
+      pawns << Pawn.new(color, self)
     end
 
     if color == :white
@@ -62,6 +64,7 @@ class Board
   def movement_helper?(start_pos, end_pos, color)
     piece = @board[start_pos[0]][start_pos[1]]
 
+    return false if piece.nil?
     return false if piece.color != color
 
     if !piece.possible_moves.include?(end_pos)
@@ -210,34 +213,38 @@ class Board
   def print_board
     piece_set = get_visual_pieces
     #NOTICE THAT THE BOARD IS REVERSED HERE, LOOKING FROM WHITE'S POV
-    counter = 7 #get rid of this later, use a diff method. purpose is to list rows
+    board_output = ""
 
+    backgrounds = [:cyan, :light_blue]
     @board.reverse.each_with_index do |row, ind|
       row_output = ''
       row.each do |piece|
-        row_output << '|'
+        #row_output << ' '.colorize(:background => backgrounds[0])
         if piece.nil?
-          row_output << ' '
+          row_output << '  '.colorize(:background => backgrounds[0])
+          backgrounds.reverse!
         else
           color_set = piece_set[piece.color]
-          row_output << color_set[piece.class.to_s.downcase.to_sym]
+          row_output << (color_set[piece.class.to_s.downcase.to_sym] + " ").colorize(:color => piece.color, :background => backgrounds[0])
+          backgrounds.reverse!
         end
       end
-      p "#{counter} " << row_output << "|"
-      counter -= 1
+      board_output << "#{8 - ind} " << row_output << " \n"
+      backgrounds.reverse!
     end
 
-    p "   " << (0..7).to_a.join(" ")
+    board_output << "  " << ("A".."H").to_a.join(" ")
+    puts board_output
   end
 
   def get_visual_pieces
     white_unicode = {
-      :king => "\u2654",
-      :queen => "\u2655",
-      :rook => "\u2656",
-      :bishop => "\u2657",
-      :knight => "\u2658",
-      :pawn => "\u2659"
+      :king => "\u265A",
+      :queen => "\u265B",
+      :rook => "\u265C",
+      :bishop => "\u265D",
+      :knight => "\u265E",
+      :pawn => "\u265F"
     }
 
     black_unicode = {

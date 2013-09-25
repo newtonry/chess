@@ -120,19 +120,33 @@ end
 
 
 class Pawn < Piece
-  def initialize color
+  def initialize color, board
     super(color)
+    @board = board
   end
 
   def possible_moves
-
-    #still lacking possible diagonal moves
     direction = @color == :white ? 1 : -1
 
-    move = [@position[0] + direction, @position[1]]
-    return [] if !move_on_board?(move)
+    moves = []
+    basic_move = [@position[0] + direction, @position[1]]
+    moves << basic_move if move_on_board?(basic_move) and @board.get_board_piece(basic_move).nil?
 
-    [move]
+    attacks = []
+    attacks << [@position[0] + direction, @position[1] + 1]
+    attacks << [@position[0] + direction, @position[1] - 1]
+
+
+    attacks.select! do |move|
+      if move_on_board?(move)
+        attacked_piece = @board.get_board_piece(move)
+        attacked_piece != nil and attacked_piece.color != @color
+      else
+        false
+      end
+    end
+
+    moves + attacks
   end
 end
 

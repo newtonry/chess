@@ -23,7 +23,7 @@ class Chess
         @board.make_move(move[0], move[1])
         turn.reverse!
         if @board.checkmate?(turn[0])
-          puts "Checkmate! #{turn[0].to_s} loses!"
+          puts "Checkmate! #{turn.first.to_s.capitalize} loses!"
           return
         end
       else
@@ -33,13 +33,19 @@ class Chess
   end
 
   def prompt_user_for_move
-    puts "Please enter the next move (e.g. 0,1 2,0)"
-    sanitize_input(gets.chomp)
+    print "Please enter the next move (e.g. a2 a3): "
+    sanitize_input(gets)
   end
 
   def sanitize_input input
-    start_pos = input.split(" ")[0].split(',').map {|num| num.to_i}
-    end_pos = input.split(" ")[1].split(',').map {|num| num.to_i}
+    input = input.strip.upcase
+    start_pos, end_pos = *input.split
+
+    start_pos = start_pos.each_char.to_a
+    start_pos = [start_pos[1].to_i - 1, start_pos[0].ord - "A".ord]
+    end_pos = end_pos.each_char.to_a
+    end_pos = [end_pos[1].to_i - 1, end_pos[0].ord - "A".ord]
+
     [start_pos, end_pos]
   end
 end
