@@ -20,8 +20,11 @@ class Chess
 
       if @board.is_valid_move?(move[0], move[1], turn.first)
 
-        @board.make_move(move[0], move[1])
+        @board.make_move(move[0], move[1])    
         turn.reverse!
+        @board.check?(turn[0])
+      else
+        puts "Not a valid move"
       end
     end
   end

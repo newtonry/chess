@@ -57,12 +57,10 @@ class Board
     return false if piece.color != color
 
     if !piece.possible_moves.include?(end_pos)
-      puts "Piece can't move there!!!!!"
       return false
     end
 
     if same_color_collision?(start_pos, end_pos)
-      puts "You can't take your own piece!!!"
       return false
     end
 
@@ -71,8 +69,11 @@ class Board
     end
 
     #still have to run the is king in check
-
-
+    if puts_self_in_check?(start_pos, end_pos, color)
+      "YOU PUT YOURSELF IN CHECK!"
+      return false 
+    end
+    
     true
   end
 
@@ -89,18 +90,45 @@ class Board
       return false if pos == end_pos #need to code this better
 
       if !@board[pos[0]][pos[1]].nil? #a piece is in the way!
-        puts "Piece can't move there!!!!!"
         return true
       end
     end
     false
   end
 
+  def puts_self_in_check? start_pos, end_pos, color    
+    test_board = self.deep_dup
+    piece = test_board.get_board_piece(start_pos)
+    
+    p piece.class
+    
+  #  test_board[start_pos[0]][start_pos[1]] = nil
+   # test_board[end_pos[0]][end_pos[1]] = piece
+    
+    check?(color)
+  end
+
+
   #sees if the given color's king is in check
   def check? color
+    if color == :white
+      pieces = select_all_pieces_of(:black)
+      king_position = find_king_position(color)
+    else
+      pieces = select_all_pieces_of(:white)
+      king_position = find_king_position(color)
+    end
     
     
-    
+    pieces.each do |piece|
+      piece.possible_moves.each do |move|
+        if is_valid_move?(piece.position, move, piece.color) and move == king_position
+          puts "CHHHHHHHHHHHECCCCCCCCCCCCCCCCKKKKKKKKK!KKK"
+          return true
+        end
+      end
+    end
+    false
   end
 
   def select_all_pieces_of color
