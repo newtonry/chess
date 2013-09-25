@@ -62,22 +62,28 @@ class Board
     end
 
     if piece.is_a?(SlidingPiece)
-      direction = get_direction(start_pos, end_pos)
-      pos = start_pos.dup
-
-      #incrementally moves pos towards the end_pos
-      until pos == end_pos
-        pos[0] += direction[0]
-        pos[1] += direction[1]
-
-        if !@board[pos[0]][pos[1]].nil? #a piece is in the way!
-          puts "Piece can't move there!!!!!"
-          return false
-        end
-      end
+      return false if sliding_piece_collision(start_pos, end_pos)
     end
 
     true
+  end
+
+  def sliding_piece_collision? start_pos, end_pos
+    direction = get_direction(start_pos, end_pos)
+    pos = start_pos.dup
+
+    #incrementally moves pos towards the end_pos
+    until pos == end_pos
+      pos[0] += direction[0]
+      pos[1] += direction[1]
+
+      if !@board[pos[0]][pos[1]].nil? #a piece is in the way!
+        puts "Piece can't move there!!!!!"
+        return true
+      end
+    end
+    false
+
   end
 
   #duplicates board so that we can test moves
