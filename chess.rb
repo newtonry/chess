@@ -14,24 +14,23 @@ class Chess
     loop do
       system('clear')
       puts
-      @board.print_board
+      puts @board
       puts
       if erred
         puts "Invalid move!"
         erred = false
       end
       puts "#{turn.first.to_s.capitalize}'s turn!"
+      puts "Castle possible? #{@board.castle_possible(turn.first)}"
 
       move = prompt_user_for_move
-      next if move == nil
-      if @board.is_valid_move?(move[0], move[1], turn.first)
 
+      if move != nil && @board.is_valid_move?(move[0], move[1], turn.first)
         @board.make_move(move[0], move[1])
 
-        upgrade_pawn = @board.get_pawn_in_back_row
-
-        unless upgrade_pawn.nil?
-          prompt_upgrade(upgrade_pawn)
+        if upgrade_pawn = @board.get_pawn_in_back_row
+          type = prompt_upgrade(upgrade_pawn)
+          # board.upgrade(piece, type)
         end
 
         turn.reverse!

@@ -5,7 +5,7 @@ class Piece
   attr_accessor :position, :color
 
   #creates the piece in a given position
-  def initialize color, position = nil
+  def initialize color, position
     @color = color
     @position = position
   end
@@ -37,6 +37,18 @@ class SlidingPiece < Piece
 end
 
 class Rook < SlidingPiece
+  attr_accessor :has_moved
+
+  def initialize color, position
+    super(color, position)
+    @has_moved = false
+  end
+
+  def position= position
+    @has_moved = true
+    @position = position
+  end
+
   def move_dirs
     STRAIGHT_DIRS
   end
@@ -64,6 +76,18 @@ class SteppingPiece < Piece
 end
 
 class King < SteppingPiece
+  attr_accessor :has_moved
+
+  def initialize color, position
+    super(color, position)
+    @has_moved = false
+  end
+
+  def position= position
+    @has_moved = true
+    @position = position
+  end
+
   def move_dirs
     STRAIGHT_DIRS + DIAGONAL_DIRS
   end
@@ -78,8 +102,8 @@ class Knight < SteppingPiece
 end
 
 class Pawn < Piece
-  def initialize color, board
-    super(color)
+  def initialize color, position, board
+    super(color, position)
     @board = board
   end
 

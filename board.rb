@@ -12,12 +12,13 @@ class Board
 
   attr_accessor :board
 
-  def initialize board_status = nil
-    if board_status.nil?
-      @board = Array.new(8) { [nil] * 8 }
-    else
-      @board = board_status
-    end
+  def initialize board = nil
+    @board = board || Array.new(8) { Array.new(8) }
+    # if board_status.nil?
+    #   @board = Array.new(8) { Array.new(8) }
+    # else
+    #   @board = board_status
+    # end
   end
 
   #sets up pieces in new starting position
@@ -28,35 +29,41 @@ class Board
 
   def setup_color color
     pieces = [
-      Rook.new(color),
-      Knight.new(color),
-      Bishop.new(color),
-      Queen.new(color),
-      King.new(color),
-      Bishop.new(color),
-      Knight.new(color),
-      Rook.new(color)
+      Rook,
+      Knight,
+      Bishop,
+      Queen,
+      King,
+      Bishop,
+      Knight,
+      Rook
     ]
 
     pawns = []
-    8.times { pawns << Pawn.new(color, self) }
+    8.times { pawns << Pawn }
 
     if color == :white
-      fill_row(0, pieces)
-      fill_row(1, pawns)
+      fill_row(0, pieces, color)
+      fill_row(1, pawns, color)
     else
-      fill_row(7, pieces)
-      fill_row(6, pawns)
+      fill_row(7, pieces, color)
+      fill_row(6, pawns, color)
     end
   end
 
 
-  def fill_row row_ind, pieces
+  def fill_row row_ind, pieces, color
     @board[row_ind].each_with_index do |square, ind|
-      @board[row_ind][ind] = pieces.shift
-      @board[row_ind][ind].position = [row_ind, ind]
+      piece_class = pieces.shift
+      piece = piece_class == Pawn ? piece_class.new(color, [row_ind, ind], self) : piece_class.new(color, [row_ind, ind])
+      @board[row_ind][ind] = piece
     end
   end
+
+  # def []
+  # def []=
+  # def piece_at
+  # def set_piece_at
 
   def make_move start_pos, end_pos
     piece = get_board_piece(start_pos)
@@ -72,6 +79,7 @@ class Board
     true
   end
 
+  # def valid_without_check?
   def movement_helper?(start_pos, end_pos, color)
     piece = @board[start_pos[0]][start_pos[1]]
 
@@ -104,24 +112,20 @@ class Board
     test_board.check?(color)
   end
 
+  def other_color color
+    color == :white ? :black : :white
+  end
 
   #sees if the given color's king is in check
   def check? color
-    if color == :white
-      pieces = select_all_pieces_of(:black)
-      king_position = find_king_position(color)
-    else
-      pieces = select_all_pieces_of(:white)
-      king_position = find_king_position(color)
-    end
+    pieces = select_all_pieces_of(other_color(color))
+    king_position = find_king_position(color)
 
-    pieces.each do |piece|
-      piece.possible_moves.each do |move|
-        return true if movement_helper?(piece.position, move, piece.color) && move == king_position
+    pieces.any? do |piece|
+      piece.possible_moves.any? do |move|
+        movement_helper?(piece.position, move, piece.color) && move == king_position
       end
     end
-
-    false
   end
 
   #sees if game is over
@@ -160,10 +164,10 @@ class Board
     raise "Never found King, something's wrong"
   end
 
-  def same_color_collision? (start_pos, end_pos)
+  def same_color_collision? start_pos, end_pos
     start_piece = get_board_piece(start_pos)
     end_piece = get_board_piece(end_pos)
-    return start_piece && end_piece && start_piece.color == end_piece.color
+    start_piece && end_piece && start_piece.color == end_piece.color
   end
 
   def get_board_piece pos
@@ -197,13 +201,44 @@ class Board
   end
 
   def get_pawn_in_back_row
-    (@board[7] + @board[0]).each do |piece|
-      return piece if piece.is_a?(Pawn)
+    (@board[7] + @board[0]).find do |piece|
+      piece.is_a?(Pawn)
     end
-    nil
   end
 
-  def print_board
+  def castle_possible color
+    return false if check?(color)
+    row = color == :white ? 0 : 7
+    king = get_board_piece([row, 4])
+    return false if !king.is_a?(King) || king.has_moved
+
+    rooks = [get_board_piece([row, 0]), get_board_piece([row, 7])]
+    rooks.select! do |rook|
+      rook.is_a?(Rook) && !rook.has_moved && test_castle_path?(king, rook)
+    end
+    return false if rooks.empty?
+
+    true
+  end
+
+  def test_castle_path? king, rook
+    test_board = deep_dup
+    king = test_board.get_board_piece(king.position)
+    rook = test_board.get_board_piece(rook.position)
+    row = king.position[0]
+    king_col, rook_col = king.position[1], rook.position[1]
+    col_range = rook_col > king_col ? (king_col + 1..rook_col - 1) : (rook_col + 1..king_col - 1)
+    col_range.each do |col|
+      pos = [row, col]
+      return false unless test_board.get_board_piece(pos).nil?
+      test_board.make_move(king.position, pos)
+      return false if test_board.check?(king.color)
+    end
+    true
+  end
+
+
+  def to_s
     #NOTICE THAT THE BOARD IS REVERSED HERE, LOOKING FROM WHITE'S POV
     board_output = ""
     backgrounds = [:cyan, :light_blue]
@@ -225,6 +260,6 @@ class Board
     end
 
     board_output << "  " + ("A".."H").to_a.join(" ")
-    puts board_output
+    board_output
   end
 end
